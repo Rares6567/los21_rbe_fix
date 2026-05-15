@@ -1,28 +1,31 @@
-# Fix Steps
-Just cd into the android root directory and copy & paste the following commands as followed:
+# BuildBuddy RBE fix for LineageOS 21
 
-0. Clone it
+## Apply the patch
+
+From the tree root:
+
 ```bash
-git clone https://github.com/Rares6567/new_rbe_fix tutorial
+./tutorial/scripts/patch_rewrapper.sh
 ```
 
-1. Remove any shell-level `RBE_DIR` override so the tree can choose its own
-   client:
+## Set up your build shell
 
 ```bash
 unset RBE_DIR
+unset RBE_service_no_auth
+export USE_RBE=1
+export RBE_service=remote.buildbuddy.io:443
+export RBE_remote_headers=x-buildbuddy-api-key=YOUR_API_KEY
+export RBE_use_rpc_credentials=false
 ```
 
-2. Build a patched reclient bundle for the tree:
+If `RBE_service_no_auth=true` is set in your `~/.zshrc` / `~/.bashrc`,
+delete it.
+
+## Build
 
 ```bash
-bash tutorial/scripts/build_patched_reclient.sh .
+source build/envsetup.sh
+lunch lineage_<device>-ap2a-userdebug
+m
 ```
-
-3. Point the tree defaults at the patched bundle:
-
-```bash
-patch -p1 < tutorial/patches/android-rbe-buildbuddyfix-defaults.patch
-```
-
-4. Start your build :D
